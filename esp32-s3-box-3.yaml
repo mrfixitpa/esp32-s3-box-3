@@ -89,6 +89,34 @@ wifi:
 
 captive_portal:
 
+
+time:
+  - platform: homeassistant
+    id: ha_time
+
+
+
+sensor:
+  - platform: homeassistant
+    id: avg_indoor_temp
+
+interval:
+  - interval: 10s
+    then:
+      - if:
+          condition:
+            lambda: |-
+              return
+                !id(init_in_progress) &&
+                wifi::global_wifi_component->is_connected() &&
+                api::global_api_server->is_connected() &&
+                (id(voice_assistant_phase) == ${voice_assist_idle_phase_id});
+          then:
+            - script.execute: draw_display
+
+    entity_id: sensor.average_indoor_temperature
+    internal: true
+
 button:
   - platform: factory_reset
     id: factory_reset_btn
@@ -715,6 +743,23 @@ font:
     glyphsets:
       - ${font_glyphsets}
 
+  - file:
+      type: gfonts
+      family: ${font_family}
+      weight: 600
+    id: font_clock
+    size: 86
+    glyphsets:
+      - ${font_glyphsets}
+
+  - file:
+      type: gfonts
+      family: ${font_family}
+      weight: 400
+    id: font_bottom
+    size: 24
+    glyphsets:
+      - ${font_glyphsets}
 text_sensor:
   - id: text_request
     platform: template
@@ -775,9 +820,33 @@ display:
       - id: idle_page
         lambda: |-
           it.fill(id(idle_color));
-          it.image((it.get_width() / 2), (it.get_height() / 2), id(casita_idle), ImageAlign::CENTER);
+
+          // --- BIG CLOCK near the top ---
+          auto t = id(ha_time).now();
+          if (t.is_valid()) {
+            int hour = t.hour % 12;
+            if (hour == 0) hour = 12;
+
+            char time_str[6];
+            snprintf(time_str, sizeof(time_str), "%d:%02d", hour, t.minute);
+
+            // Big time, centered toward the top
+            it.printf(160, 18, id(font_clock), Color::WHITE, TextAlign::TOP_CENTER, "%s", time_str);
+          } else {
+            it.printf(160, 40, id(font_bottom), Color::WHITE, TextAlign::CENTER, "--:--");
+          }
+
+          // --- Bottom line: "Indoor Temp 72°" ---
+          if (!isnan(id(avg_indoor_temp).state)) {
+            it.printf(160, 200, id(font_bottom), Color::WHITE, TextAlign::CENTER, "Indoor Temp %.0f°", id(avg_indoor_temp).state);
+          } else {
+            it.printf(160, 200, id(font_bottom), Color::WHITE, TextAlign::CENTER, "Indoor Temp --°");
+          }
+
+          // Keep your existing timer UI
           id(draw_timer_timeline).execute();
           id(draw_active_timer_widget).execute();
+
       - id: listening_page
         lambda: |-
           it.fill(id(listening_color));
@@ -825,3 +894,4 @@ display:
           it.fill(Color::BLACK);
           id(draw_timer_timeline).execute();
           id(draw_active_timer_widget).execute();
+
