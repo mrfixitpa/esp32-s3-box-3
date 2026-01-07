@@ -89,6 +89,84 @@ If you are unsure, **start with the clock version** — it can always be changed
 
 ---
 
+
+
+---
+
+## 🖼️ Screen Illustrations (Images)
+
+This project uses **custom full-screen illustrations** to represent the different voice assistant states (idle, listening, thinking, speaking, error, etc.).
+
+### Where the Illustrations Come From
+You have two options:
+
+#### Option 1: Use the Included / Community Images
+Many users reuse or adapt illustrations from:
+- ESPHome Voice Assistant examples
+- Community projects (GitHub, Discord, forums)
+- Your own custom-designed images
+
+Images should be **exactly 320 × 240 pixels** for best results on the ESP32-S3-Box-3 display.
+
+Supported formats:
+- `.png`
+- `.jpg`
+
+---
+
+#### Option 2: Create Your Own Images
+You can create your own illustrations using tools such as:
+- Photoshop
+- GIMP
+- Figma
+- Canva
+- AI image generation tools
+
+**Guidelines for best results:**
+- Resolution: **320 × 240**
+- Orientation: Landscape
+- Keep designs simple and high-contrast
+- Avoid text near the edges of the screen
+
+---
+
+### Where to Store the Images (Home Assistant)
+All illustration images must be uploaded into Home Assistant.
+
+Recommended location:
+```
+/config/www/voice_assistant_images/
+```
+
+Example filenames:
+```
+idle.jpg
+listening.jpg
+thinking.jpg
+speaking.jpg
+error.jpg
+```
+
+Once uploaded, reference them in your ESPHome YAML using a URL like:
+
+```yaml
+substitutions:
+  idle_illustration_file: /local/voice_assistant_images/idle.jpg
+  listening_illustration_file: /local/voice_assistant_images/listening.jpg
+  thinking_illustration_file: /local/voice_assistant_images/thinking.jpg
+  replying_illustration_file: /local/voice_assistant_images/speaking.jpg
+```
+
+> **Note:** `/local/` maps to `/config/www/` in Home Assistant.
+
+---
+
+### Common Mistakes
+- Using images larger or smaller than 320 × 240
+- Incorrect filenames or paths (paths are case-sensitive)
+- Uploading images outside `/config/www/`
+
+---
 ## 📸 Screenshots
 
 <p align="center">
