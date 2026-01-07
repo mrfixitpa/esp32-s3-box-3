@@ -51,7 +51,7 @@ esphome:
           then:
             - lambda: id(init_in_progress) = false;
             - script.execute: draw_display
-
+            
 esp32:
   board: esp32s3box
   flash_size: 16MB
