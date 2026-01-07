@@ -9,7 +9,7 @@ The goal of this project is to provide a **clean, minimal, and informative displ
 ## ✨ Features
 
 ### 🧼 Clean Display Layout
-- Removes the default **top and bottom text boxes**
+- Removes the default **top and bottom text boxes (bubbles)**
 - Uses **full-screen custom illustrations** for all voice assistant states
 - Clean, distraction-free interface designed for wall or desk placement
 
@@ -31,7 +31,7 @@ When you say **“Hey Jarvis”**, the display seamlessly switches to full-scree
 
 - **Listening**
 - **Thinking**
-- **Replying**
+- **Speaking / Replying**
 - **Error / Not Ready**
 - **Timer Finished**
 
@@ -39,64 +39,101 @@ Once the response is complete, the display returns to the idle clock screen.
 
 ---
 
-### ⏱️ Clock Display Options
-This project exposes easy-to-use toggles in Home Assistant:
+## 📁 Available Configuration Files
 
-- **12-hour / 24-hour format toggle**
-- **AM/PM display toggle** (only visible in 12-hour mode)
+> ⚠️ **Important:**  
+> These YAML files are **ESPHome package files**, not complete standalone device configurations.  
+> They must be **included in or merged with your main ESP32-S3-Box-3 ESPHome YAML** and may require editing before compiling.
 
-All changes:
-- Apply instantly
-- Do **not** require reflashing
-- Can be changed at any time
+### 1️⃣ `esp32-s3-box-3.yaml` — Minimal / Clean Display
+- Removes top and bottom text bubbles
+- Uses full-screen illustrations only
+- No clock or temperature display
+
+**Best for:** users who want a clean, image-only voice assistant display.
+
+---
+
+### 2️⃣ `esp32-s3-box-3_clock.yaml` — Clock & Temperature Display
+Includes everything from the minimal version, plus:
+- Large idle clock
+- Indoor temperature display
+- 12h / 24h toggle
+- AM/PM toggle (12h mode only)
+- Blinking colon with no layout shifting
+
+**Best for:** users who want a useful always-on clock and status display.
+
+---
+
+## 📊 Feature Comparison
+
+| Feature | Minimal | Clock |
+|------|--------|-------|
+| Removes text bubbles | ✅ | ✅ |
+| Full-screen illustrations | ✅ | ✅ |
+| Idle clock | ❌ | ✅ |
+| Indoor temperature | ❌ | ✅ |
+| 12h / 24h toggle | ❌ | ✅ |
+| AM/PM toggle | ❌ | ✅ |
+| Blinking colon | ❌ | ✅ |
+
+---
+
+## 🤔 Which Should I Choose?
+
+- Choose **Minimal** if you want the cleanest possible display with no extra configuration.
+- Choose **Clock** if you want the device to double as a smart clock and information display.
+
+If you are unsure, **start with the clock version** — it can always be changed later.
 
 ---
 
 ## 📸 Screenshots
 
-> *(Add screenshots to an `images/` folder in this repository)*
+<p align="center">
+  <img src="images/idle.jpg" width="45%">
+  <img src="images/listening.jpg" width="45%">
+</p>
+<p align="center"><em>Idle Screen (Clock & Indoor Temperature) • Listening</em></p>
 
-Suggested screenshots:
-- Idle screen with clock and temperature
-- Listening screen
-- Thinking screen
-- Replying screen
-
-Example usage:
-
-```markdown
-![Idle Clock](images/idle.jpg)
-```
+<p align="center">
+  <img src="images/thinking.jpg" width="45%">
+  <img src="images/speaking.jpg" width="45%">
+</p>
+<p align="center"><em>Thinking • Speaking / Replying</em></p>
 
 ---
 
 ## 🚀 Quick Start Guide
 
 ### Requirements
-- **ESP32-S3-Box-3**
-- **Home Assistant**
-- **ESPHome** installed in Home Assistant
-- An existing **indoor temperature sensor** in Home Assistant  
-  *(example used: `sensor.average_indoor_temperature`)*
+- ESP32-S3-Box-3
+- Home Assistant
+- ESPHome installed in Home Assistant
+- Existing Home Assistant temperature sensor  
+  *(example: `sensor.average_indoor_temperature`)*
 
 ---
 
-### Step 1: Add the YAML to ESPHome
-1. Open **ESPHome** in Home Assistant
-2. Create a new device or edit your existing ESP32-S3-Box-3
-3. Paste the contents of:
+### Step 1: Choose a Configuration File
+- `esp32-s3-box-3.yaml` → clean display only
+- `esp32-s3-box-3_clock.yaml` → clock + temperature
 
-```text
-esp32-s3-box-3_clock.yaml
+---
+
+### Step 2: Add the Package to ESPHome
+Reference the file from your main ESPHome device YAML:
+
+```yaml
+packages:
+  s3_box:
+    url: github://YOUR_USERNAME/YOUR_REPO/esp32-s3-box-3_clock.yaml@<commit_sha>
 ```
 
-into your ESPHome configuration  
-*(or reference it using `packages:` if preferred)*
-
 ---
 
-### Step 2: Configure the Temperature Sensor
-Ensure your Home Assistant temperature sensor is defined correctly:
+### Step 3: Edit Before Compiling (Clock Version Only)
 
 ```yaml
 sensor:
@@ -106,38 +143,32 @@ sensor:
     internal: true
 ```
 
-Replace `sensor.average_indoor_temperature` with your own sensor if needed.
+Replace the entity ID with your own sensor.
 
 ---
 
-### Step 3: Compile and Upload
-1. Click **Install**
-2. Upload the firmware to the ESP32-S3-Box-3
-3. Wait for the device to reboot
-
-Once online, the idle screen will display the clock and temperature.
+### Step 4: Compile and Upload
+- Click **Install**
+- Upload firmware
+- Wait for reboot
 
 ---
 
-### Step 4: Clock Display Options
-After flashing, new entities appear in Home Assistant:
-- Toggle **12-hour / 24-hour** time format
-- Toggle **AM/PM display** *(12-hour mode only)*
+### Step 5: Optional Clock Settings
+After flashing, Home Assistant will expose:
+- 12h / 24h toggle
+- AM/PM toggle
 
-These settings:
-- Take effect immediately
-- Do **not** require reflashing
-- Can be changed at any time
+These apply instantly and require no reflashing.
 
 ---
 
 ## 🛠 Notes & Tips
-- Screen dimming is best handled using **Home Assistant automations**
-- The display layout prevents text shifting when the colon blinks
-- Designed to remain readable from across a room
-- All voice assistant states use full-screen illustrations
+- Screen dimming is best handled using Home Assistant automations
+- Layout prevents jitter when the colon blinks
+- Optimized for readability from a distance
 
 ---
 
 ## 📄 License
-This project is provided **as-is** for personal and educational use.
+Provided as-is for personal and educational use.
