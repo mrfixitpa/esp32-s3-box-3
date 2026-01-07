@@ -891,7 +891,6 @@ display:
                 // Place it just left of the time, aligned with the colon's vertical center.
                 it.printf(108, 51, id(font_ampm), Color::WHITE, TextAlign::TOP_CENTER, "%s", ampm);
               }
-}
           } else {
             it.printf(160, 40, id(font_bottom), Color::WHITE, TextAlign::CENTER, "--:--");
           }
