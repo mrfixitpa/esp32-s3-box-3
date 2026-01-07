@@ -884,13 +884,14 @@ display:
               // 12-hour mode (NO leading zero; keep clock centered with temp)
               it.printf(150, 18, id(font_clock), Color::WHITE, TextAlign::TOP_RIGHT, "%d", hour12);
               it.printf(160, 18, id(font_clock), (colon_on ? Color::WHITE : id(idle_color)), TextAlign::TOP_CENTER, ":");
-              it.printf(170, 18, id(font_clock), Color::WHITE, TextAlign::TOP_LEFT, "%02d", t.minute);              // Optional AM/PM indicator (left of the colon, vertically centered in the clock)
+              it.printf(170, 18, id(font_clock), Color::WHITE, TextAlign::TOP_LEFT, "%02d", t.minute);
+
+              // Optional AM/PM indicator (left of the colon, vertically centered in the clock)
               if (id(show_ampm)) {
                 const char* ampm = (t.hour >= 12) ? "PM" : "AM";
-                // Clock top Y = 18, font_clock size = 86, font_ampm size = 20 => am/pm top Y ≈ 18 + (86-20)/2 = 51
-                // Place it just left of the time, aligned with the colon's vertical center.
                 it.printf(108, 51, id(font_ampm), Color::WHITE, TextAlign::TOP_CENTER, "%s", ampm);
               }
+            }
           } else {
             it.printf(160, 40, id(font_bottom), Color::WHITE, TextAlign::CENTER, "--:--");
           }
@@ -903,6 +904,7 @@ display:
 
           id(draw_timer_timeline).execute();
           id(draw_active_timer_widget).execute();
+
 
 
 
