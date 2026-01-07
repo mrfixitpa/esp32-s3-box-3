@@ -93,7 +93,7 @@ captive_portal:
 
 
 interval:
-  - interval: 10s
+  - interval: 1s
     then:
       - if:
           condition:
@@ -549,6 +549,18 @@ script:
             - lambda: id(voice_assistant_phase) = ${voice_assist_muted_phase_id};
 
 switch:
+  - platform: template
+    name: Clock 24 Hour Mode
+    id: clock_24h_mode
+    restore_mode: RESTORE_DEFAULT_OFF
+    optimistic: true
+    on_turn_on:
+      - lambda: id(use_24h) = true;
+      - script.execute: draw_display
+    on_turn_off:
+      - lambda: id(use_24h) = false;
+      - script.execute: draw_display
+
   - platform: gpio
     name: Speaker Enable
     pin: GPIO46
@@ -647,6 +659,11 @@ select:
                         - micro_wake_word.start
 
 globals:
+  - id: use_24h
+    type: bool
+    restore_value: true
+    initial_value: "false"
+
   - id: init_in_progress
     type: bool
     restore_value: false
@@ -823,11 +840,27 @@ display:
 
           auto t = id(ha_time).now();
           if (t.is_valid()) {
-            int hour = t.hour % 12;
-            if (hour == 0) hour = 12;
+            // Blink colon (toggles each second)
+            bool colon_on = (t.second % 2) == 0;
+
             char time_str[6];
-            snprintf(time_str, sizeof(time_str), "%d:%02d", hour, t.minute);
-            it.printf(160, 18, id(font_clock), Color::WHITE, TextAlign::TOP_CENTER, "%s", time_str);
+
+            if (id(use_24h)) {
+              // 24-hour mode
+              snprintf(time_str, sizeof(time_str), "%02d%s%02d", t.hour, (colon_on ? ":" : " "), t.minute);
+              it.printf(160, 18, id(font_clock), Color::WHITE, TextAlign::TOP_CENTER, "%s", time_str);
+            } else {
+              // 12-hour mode with AM/PM
+              int hour12 = t.hour % 12;
+              if (hour12 == 0) hour12 = 12;
+              const char* ampm = (t.hour >= 12) ? "PM" : "AM";
+
+              snprintf(time_str, sizeof(time_str), "%d%s%02d", hour12, (colon_on ? ":" : " "), t.minute);
+              it.printf(160, 18, id(font_clock), Color::WHITE, TextAlign::TOP_CENTER, "%s", time_str);
+
+              // Small AM/PM to the right
+              it.printf(260, 44, id(font_bottom), Color::WHITE, TextAlign::CENTER, "%s", ampm);
+            }
           } else {
             it.printf(160, 40, id(font_bottom), Color::WHITE, TextAlign::CENTER, "--:--");
           }
@@ -840,6 +873,7 @@ display:
 
           id(draw_timer_timeline).execute();
           id(draw_active_timer_widget).execute();
+
 
       - id: listening_page
         lambda: |-
