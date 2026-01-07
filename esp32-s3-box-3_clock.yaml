@@ -550,6 +550,18 @@ script:
 
 switch:
   - platform: template
+    name: Clock AM/PM Indicator
+    id: ampm_toggle
+    restore_mode: RESTORE_DEFAULT_ON
+    optimistic: true
+    on_turn_on:
+      - lambda: id(show_ampm) = true;
+      - script.execute: draw_display
+    on_turn_off:
+      - lambda: id(show_ampm) = false;
+      - script.execute: draw_display
+
+  - platform: template
     name: Clock 24 Hour Mode
     id: clock_24h_mode
     restore_mode: RESTORE_DEFAULT_OFF
@@ -659,6 +671,11 @@ select:
                         - micro_wake_word.start
 
 globals:
+  - id: show_ampm
+    type: bool
+    restore_value: true
+    initial_value: "true"
+
   - id: use_24h
     type: bool
     restore_value: true
@@ -859,19 +876,21 @@ display:
             if (hour12 == 0) hour12 = 12;
 
             if (id(use_24h)) {
-              // 24-hour mode (unchanged, perfectly centered)
+              // 24-hour mode (centered)
               it.printf(150, 18, id(font_clock), Color::WHITE, TextAlign::TOP_RIGHT, "%02d", t.hour);
               it.printf(160, 18, id(font_clock), (colon_on ? Color::WHITE : id(idle_color)), TextAlign::TOP_CENTER, ":");
               it.printf(170, 18, id(font_clock), Color::WHITE, TextAlign::TOP_LEFT, "%02d", t.minute);
             } else {
-              // 12-hour mode (optically centered: shifted slightly left)
-              it.printf(142, 18, id(font_clock), Color::WHITE, TextAlign::TOP_RIGHT, "%d", hour12);
-              it.printf(152, 18, id(font_clock), (colon_on ? Color::WHITE : id(idle_color)), TextAlign::TOP_CENTER, ":");
-              it.printf(162, 18, id(font_clock), Color::WHITE, TextAlign::TOP_LEFT, "%02d", t.minute);
+              // 12-hour mode (NO leading zero; keep clock centered with temp)
+              it.printf(150, 18, id(font_clock), Color::WHITE, TextAlign::TOP_RIGHT, "%d", hour12);
+              it.printf(160, 18, id(font_clock), (colon_on ? Color::WHITE : id(idle_color)), TextAlign::TOP_CENTER, ":");
+              it.printf(170, 18, id(font_clock), Color::WHITE, TextAlign::TOP_LEFT, "%02d", t.minute);
 
-              // AM / PM (smaller, top-right)
-              const char* ampm = (t.hour >= 12) ? "PM" : "AM";
-              it.printf(315, 26, id(font_ampm), Color::WHITE, TextAlign::TOP_RIGHT, "%s", ampm);
+              // Optional AM/PM indicator (centered under the clock so it doesn't pull the layout right)
+              if (id(show_ampm)) {
+                const char* ampm = (t.hour >= 12) ? "PM" : "AM";
+                it.printf(160, 105, id(font_ampm), Color::WHITE, TextAlign::CENTER, "%s", ampm);
+              }
             }
           } else {
             it.printf(160, 40, id(font_bottom), Color::WHITE, TextAlign::CENTER, "--:--");
@@ -885,6 +904,7 @@ display:
 
           id(draw_timer_timeline).execute();
           id(draw_active_timer_widget).execute();
+
 
 
 
