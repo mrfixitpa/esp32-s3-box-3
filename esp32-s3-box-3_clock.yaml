@@ -853,31 +853,30 @@ display:
 
           auto t = id(ha_time).now();
           if (t.is_valid()) {
+            // Blink colon (toggles each second) WITHOUT shifting digits
             bool colon_on = (t.second % 2) == 0;
-
-            char time_str[12];
 
             int hour12 = t.hour % 12;
             if (hour12 == 0) hour12 = 12;
 
-            int show_hour = id(use_24h) ? t.hour : hour12;
+            // Draw hours (right-aligned), colon (center), minutes (left-aligned)
+            if (id(use_24h)) {
+              // 24-hour mode (keep leading zero if hour < 10)
+              it.printf(150, 18, id(font_clock), Color::WHITE, TextAlign::TOP_RIGHT, "%02d", t.hour);
+            } else {
+              // 12-hour mode (NO leading zero)
+              it.printf(150, 18, id(font_clock), Color::WHITE, TextAlign::TOP_RIGHT, "%d", hour12);
 
-            // Fixed-width time string with spaces around colon
-            snprintf(time_str, sizeof(time_str), "%02d : %02d", show_hour, t.minute);
-
-            // Draw stable clock
-            it.printf(160, 18, id(font_clock), Color::WHITE, TextAlign::TOP_CENTER, "%s", time_str);
-
-            // Blink colon by overdrawing it in background color
-            if (!colon_on) {
-              it.printf(160, 18, id(font_clock), id(idle_color), TextAlign::TOP_CENTER, ":");
-            }
-
-            // AM / PM indicator (12-hour mode only)
-            if (!id(use_24h)) {
+              // AM/PM (smaller, top-right, clear of digits)
               const char* ampm = (t.hour >= 12) ? "PM" : "AM";
-              it.printf(260, 44, id(font_ampm), Color::WHITE, TextAlign::CENTER, "%s", ampm);
+              it.printf(315, 26, id(font_ampm), Color::WHITE, TextAlign::TOP_RIGHT, "%s", ampm);
             }
+
+            // Colon blink
+            it.printf(160, 18, id(font_clock), (colon_on ? Color::WHITE : id(idle_color)), TextAlign::TOP_CENTER, ":");
+
+            // Minutes always two digits
+            it.printf(170, 18, id(font_clock), Color::WHITE, TextAlign::TOP_LEFT, "%02d", t.minute);
           } else {
             it.printf(160, 40, id(font_bottom), Color::WHITE, TextAlign::CENTER, "--:--");
           }
@@ -890,6 +889,7 @@ display:
 
           id(draw_timer_timeline).execute();
           id(draw_active_timer_widget).execute();
+
 
 
 
