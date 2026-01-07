@@ -853,30 +853,26 @@ display:
 
           auto t = id(ha_time).now();
           if (t.is_valid()) {
-            // Blink colon (toggles each second) WITHOUT shifting digits
             bool colon_on = (t.second % 2) == 0;
 
             int hour12 = t.hour % 12;
             if (hour12 == 0) hour12 = 12;
 
-            // Draw hours (right-aligned), colon (center), minutes (left-aligned)
             if (id(use_24h)) {
-              // 24-hour mode (keep leading zero if hour < 10)
+              // 24-hour mode (unchanged, perfectly centered)
               it.printf(150, 18, id(font_clock), Color::WHITE, TextAlign::TOP_RIGHT, "%02d", t.hour);
+              it.printf(160, 18, id(font_clock), (colon_on ? Color::WHITE : id(idle_color)), TextAlign::TOP_CENTER, ":");
+              it.printf(170, 18, id(font_clock), Color::WHITE, TextAlign::TOP_LEFT, "%02d", t.minute);
             } else {
-              // 12-hour mode (NO leading zero)
-              it.printf(150, 18, id(font_clock), Color::WHITE, TextAlign::TOP_RIGHT, "%d", hour12);
+              // 12-hour mode (optically centered: shifted slightly left)
+              it.printf(142, 18, id(font_clock), Color::WHITE, TextAlign::TOP_RIGHT, "%d", hour12);
+              it.printf(152, 18, id(font_clock), (colon_on ? Color::WHITE : id(idle_color)), TextAlign::TOP_CENTER, ":");
+              it.printf(162, 18, id(font_clock), Color::WHITE, TextAlign::TOP_LEFT, "%02d", t.minute);
 
-              // AM/PM (smaller, top-right, clear of digits)
+              // AM / PM (smaller, top-right)
               const char* ampm = (t.hour >= 12) ? "PM" : "AM";
               it.printf(315, 26, id(font_ampm), Color::WHITE, TextAlign::TOP_RIGHT, "%s", ampm);
             }
-
-            // Colon blink
-            it.printf(160, 18, id(font_clock), (colon_on ? Color::WHITE : id(idle_color)), TextAlign::TOP_CENTER, ":");
-
-            // Minutes always two digits
-            it.printf(170, 18, id(font_clock), Color::WHITE, TextAlign::TOP_LEFT, "%02d", t.minute);
           } else {
             it.printf(160, 40, id(font_bottom), Color::WHITE, TextAlign::CENTER, "--:--");
           }
@@ -889,6 +885,7 @@ display:
 
           id(draw_timer_timeline).execute();
           id(draw_active_timer_widget).execute();
+
 
 
 
