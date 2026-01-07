@@ -889,7 +889,7 @@ display:
               // Optional AM/PM indicator (left of the colon, vertically centered in the clock)
               if (id(show_ampm)) {
                 const char* ampm = (t.hour >= 12) ? "PM" : "AM";
-                it.printf(108, 51, id(font_ampm), Color::WHITE, TextAlign::TOP_CENTER, "%s", ampm);
+                it.printf(70, 53, id(font_ampm), Color::WHITE, TextAlign::TOP_RIGHT, "%s", ampm);
               }
             }
           } else {
