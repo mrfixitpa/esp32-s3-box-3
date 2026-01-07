@@ -776,8 +776,21 @@ font:
     size: 24
     glyphsets:
       - ${font_glyphsets}
+  - file:
+      type: gfonts
+      family: ${font_family}
+      weight: 400
+    id: font_ampm
+    size: 20
+    glyphsets:
+      - ${font_glyphsets}
+
 
 text_sensor:
+  - platform: version
+    name: Firmware
+    hide_timestamp: true
+
   - id: text_request
     platform: template
     on_value:
@@ -840,26 +853,30 @@ display:
 
           auto t = id(ha_time).now();
           if (t.is_valid()) {
-            // Blink colon (toggles each second)
             bool colon_on = (t.second % 2) == 0;
 
-            char time_str[6];
+            char time_str[12];
 
-            if (id(use_24h)) {
-              // 24-hour mode
-              snprintf(time_str, sizeof(time_str), "%02d%s%02d", t.hour, (colon_on ? ":" : " "), t.minute);
-              it.printf(160, 18, id(font_clock), Color::WHITE, TextAlign::TOP_CENTER, "%s", time_str);
-            } else {
-              // 12-hour mode with AM/PM
-              int hour12 = t.hour % 12;
-              if (hour12 == 0) hour12 = 12;
+            int hour12 = t.hour % 12;
+            if (hour12 == 0) hour12 = 12;
+
+            int show_hour = id(use_24h) ? t.hour : hour12;
+
+            // Fixed-width time string with spaces around colon
+            snprintf(time_str, sizeof(time_str), "%02d : %02d", show_hour, t.minute);
+
+            // Draw stable clock
+            it.printf(160, 18, id(font_clock), Color::WHITE, TextAlign::TOP_CENTER, "%s", time_str);
+
+            // Blink colon by overdrawing it in background color
+            if (!colon_on) {
+              it.printf(160, 18, id(font_clock), id(idle_color), TextAlign::TOP_CENTER, ":");
+            }
+
+            // AM / PM indicator (12-hour mode only)
+            if (!id(use_24h)) {
               const char* ampm = (t.hour >= 12) ? "PM" : "AM";
-
-              snprintf(time_str, sizeof(time_str), "%d%s%02d", hour12, (colon_on ? ":" : " "), t.minute);
-              it.printf(160, 18, id(font_clock), Color::WHITE, TextAlign::TOP_CENTER, "%s", time_str);
-
-              // Small AM/PM to the right
-              it.printf(260, 44, id(font_bottom), Color::WHITE, TextAlign::CENTER, "%s", ampm);
+              it.printf(260, 44, id(font_ampm), Color::WHITE, TextAlign::CENTER, "%s", ampm);
             }
           } else {
             it.printf(160, 40, id(font_bottom), Color::WHITE, TextAlign::CENTER, "--:--");
@@ -873,6 +890,7 @@ display:
 
           id(draw_timer_timeline).execute();
           id(draw_active_timer_widget).execute();
+
 
 
       - id: listening_page
