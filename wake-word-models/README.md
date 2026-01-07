@@ -1,1 +1,1 @@
-
+These models allow you to call your voice assistant as " Hey Kitt". The .tflite model works with Home Assistant and most likely other platforms. The .onnx works with other platforms and is not tested by me. I did not create these files and full credit should go to GitHub user tusabez and his full project link is https://github.com/tusabez/KITT_AI_Python/tree/main.
