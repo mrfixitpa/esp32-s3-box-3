@@ -1,6 +1,6 @@
 # ESP32-S3-Box-3 Custom Voice Assistant Display
 
-This repository contains **custom ESPHome configuration files** for the **ESP32-S3-Box-3**, designed for use as a **Home Assistant Voice Assistant satellite**.
+This repository contains a **custom ESPHome package** for the **ESP32-S3-Box-3**, designed for use as a **Home Assistant Voice Assistant satellite**.
 
 The goal of this project is to provide a **clean, minimal, and informative display** by removing unnecessary UI elements and adding useful, always-visible information when the device is idle.
 
@@ -15,14 +15,29 @@ The goal of this project is to provide a **clean, minimal, and informative displ
 
 ---
 
-### 🕒 Idle Screen (Clock & Temperature)
+### 🕒 Idle Screen (Clock, Temperature & HVAC Status)
 When the voice assistant is idle, the display shows:
 - A **large, centered digital clock**
 - **Indoor temperature** pulled directly from Home Assistant
+- **HVAC system status icon**
+  - 🔥 Heating
+  - ❄️ Cooling
+  - Hidden when idle
 - Optional **blinking colon**
 - Optional **AM/PM indicator** (12-hour mode only)
 
 The display automatically returns to this screen after voice interactions complete.
+
+---
+
+### 🎛 Clock Controls (No Reflash Required)
+After flashing, Home Assistant exposes configuration controls:
+- 12-hour / 24-hour time format toggle
+- AM/PM display toggle (12-hour mode only)
+- AM/PM **horizontal offset slider**
+- AM/PM **vertical offset slider**
+
+All changes apply instantly and do **not** require recompiling firmware.
 
 ---
 
@@ -39,57 +54,19 @@ Once the response is complete, the display returns to the idle clock screen.
 
 ---
 
-## 📁 Available Configuration Files
+## 📁 Configuration File
 
 > ⚠️ **Important:**  
-> These YAML files are **ESPHome package files**, not complete standalone device configurations.  
-> They must be **included in or merged with your main ESP32-S3-Box-3 ESPHome YAML** and may require editing before compiling.
+> This repository provides an **ESPHome package file**, not a complete standalone device configuration.  
+> It must be **included in your main ESP32-S3-Box-3 ESPHome YAML** and requires light editing before compiling.
 
-### 1️⃣ `esp32-s3-box-3.yaml` — Minimal / Clean Display
-- Removes top and bottom text bubbles
-- Uses full-screen illustrations only
-- No clock or temperature display
-
-**Best for:** users who want a clean, image-only voice assistant display.
-
----
-
-### 2️⃣ `esp32-s3-box-3_clock.yaml` — Clock & Temperature Display
-Includes everything from the minimal version, plus:
-- Large idle clock
-- Indoor temperature display
-- 12h / 24h toggle
-- AM/PM toggle (12h mode only)
-- Blinking colon with no layout shifting
-
-**Best for:** users who want a useful always-on clock and status display.
-
----
-
-## 📊 Feature Comparison
-
-| Feature | Minimal | Clock |
-|------|--------|-------|
-| Removes text bubbles | ✅ | ✅ |
-| Full-screen illustrations | ✅ | ✅ |
-| Idle clock | ❌ | ✅ |
-| Indoor temperature | ❌ | ✅ |
-| 12h / 24h toggle | ❌ | ✅ |
-| AM/PM toggle | ❌ | ✅ |
-| Blinking colon | ❌ | ✅ |
-
----
-
-## 🤔 Which Should I Choose?
-
-- Choose **Minimal** if you want the cleanest possible display with no extra configuration.
-- Choose **Clock** if you want the device to double as a smart clock and information display.
-
-If you are unsure, **start with the clock version** — it can always be changed later.
-
----
-
-
+### `esp32-s3-box-3.yaml`
+Includes:
+- Bubble-free display layout
+- Idle clock with temperature
+- HVAC heating/cooling indicator (Ecobee compatible)
+- Full voice assistant state illustrations
+- User-adjustable clock and AM/PM settings
 
 ---
 
@@ -97,43 +74,17 @@ If you are unsure, **start with the clock version** — it can always be changed
 
 This project uses **custom full-screen illustrations** to represent the different voice assistant states (idle, listening, thinking, speaking, error, etc.).
 
-### Where the Illustrations Come From
-You have two options:
-
-#### Option 1: Use the Included / Community Images
-Many users reuse or adapt illustrations from:
-- ESPHome Voice Assistant examples
-- Community projects (GitHub, Discord, forums)
-- Your own custom-designed images
-
-Images should be **exactly 320 × 240 pixels** for best results on the ESP32-S3-Box-3 display.
-
-Supported formats:
-- `.png`
-- `.jpg`
-
----
-
-#### Option 2: Create Your Own Images
-You can create your own illustrations using tools such as:
-- Photoshop
-- GIMP
-- Figma
-- Canva
-- AI image generation tools
-
-**Guidelines for best results:**
+### Image Requirements
 - Resolution: **320 × 240**
 - Orientation: Landscape
-- Keep designs simple and high-contrast
-- Avoid text near the edges of the screen
+- Formats: `.png` or `.jpg`
+- Simple, high-contrast designs recommended
 
 ---
 
-### Where to Store the Images (Home Assistant)
-All illustration images must be uploaded into Home Assistant.
+### Where to Store Images (Home Assistant)
 
-Recommended location:
+Upload images to:
 ```
 /config/www/voice_assistant_images/
 ```
@@ -147,7 +98,7 @@ speaking.jpg
 error.jpg
 ```
 
-Once uploaded, reference them in your ESPHome YAML using a URL like:
+Reference them in ESPHome like this:
 
 ```yaml
 substitutions:
@@ -157,23 +108,17 @@ substitutions:
   replying_illustration_file: /local/voice_assistant_images/speaking.jpg
 ```
 
-> **Note:** `/local/` maps to `/config/www/` in Home Assistant.
+> `/local/` maps to `/config/www/` in Home Assistant.
 
 ---
 
-### Common Mistakes
-- Using images larger or smaller than 320 × 240
-- Incorrect filenames or paths (paths are case-sensitive)
-- Uploading images outside `/config/www/`
-
----
 ## 📸 Screenshots
 
 <p align="center">
   <img src="images/idle.jpg" width="45%">
   <img src="images/listening.jpg" width="45%">
 </p>
-<p align="center"><em>Idle Screen (Clock & Indoor Temperature) • Listening</em></p>
+<p align="center"><em>Idle Screen (Clock, Temperature & HVAC Status) • Listening</em></p>
 
 <p align="center">
   <img src="images/thinking.jpg" width="45%">
@@ -191,27 +136,23 @@ substitutions:
 - ESPHome installed in Home Assistant
 - Existing Home Assistant temperature sensor  
   *(example: `sensor.average_indoor_temperature`)*
+- Ecobee thermostat (for HVAC status icon)
 
 ---
 
-### Step 1: Choose a Configuration File
-- `esp32-s3-box-3.yaml` → clean display only
-- `esp32-s3-box-3_clock.yaml` → clock + temperature
-
----
-
-### Step 2: Add the Package to ESPHome
-Reference the file from your main ESPHome device YAML:
+### Step 1: Add the Package to ESPHome
+In your **main ESPHome device YAML**, add:
 
 ```yaml
 packages:
   s3_box:
-    url: github://YOUR_USERNAME/YOUR_REPO/esp32-s3-box-3_clock.yaml@<commit_sha>
+    url: github://YOUR_USERNAME/YOUR_REPO/esp32-s3-box-3.yaml@v1.2.0
 ```
 
 ---
 
-### Step 3: Edit Before Compiling (Clock Version Only)
+### Step 2: Edit Before Compiling
+You **must** define your indoor temperature sensor:
 
 ```yaml
 sensor:
@@ -221,32 +162,27 @@ sensor:
     internal: true
 ```
 
-Replace the entity ID with your own sensor.
+Replace the entity ID with your own sensor if needed.
 
 ---
 
-### Step 4: Compile and Upload
+### Step 3: Compile and Upload
 - Click **Install**
-- Upload firmware
-- Wait for reboot
+- Upload firmware to the ESP32-S3-Box-3
+- Wait for the device to reboot
 
----
-
-### Step 5: Optional Clock Settings
-After flashing, Home Assistant will expose:
-- 12h / 24h toggle
-- AM/PM toggle
-
-These apply instantly and require no reflashing.
+Once online, the idle screen will show the clock, temperature, and HVAC status.
 
 ---
 
 ## 🛠 Notes & Tips
 - Screen dimming is best handled using Home Assistant automations
 - Layout prevents jitter when the colon blinks
-- Optimized for readability from a distance
+- Designed for readability from across a room
+- Burn-in prevention and night mode can be layered on later
 
 ---
 
 ## 📄 License
 Provided as-is for personal and educational use.
+
