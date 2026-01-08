@@ -835,8 +835,8 @@ font:
     id: font_mdi
     size: 26
     glyphs:
-      - "\\U000F0238"  # mdi:fire
-      - "\\U000F0717"  # mdi:snowflake
+      - "󰈸"  # mdi:fire (F0238)
+      - "󰜗"  # mdi:snowflake (F0717)
       
 text_sensor:
   - platform: version
