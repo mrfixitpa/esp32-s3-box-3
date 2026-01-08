@@ -1,5 +1,6 @@
 ---
 substitutions:
+  thermostat_entity: climate.ecobee_thermostat
   name: esp32-s3-box-3
   friendly_name: ESP32 S3 Box 3
   loading_illustration_file: https://github.com/esphome/wake-word-voice-assistants/raw/main/casita/loading_320_240.png
@@ -355,6 +356,19 @@ voice_assistant:
     - script.execute: draw_display
 
 script:
+
+  - id: draw_hvac_icon
+    then:
+      - lambda: |-
+          // Draw a small HVAC status icon near the bottom-left.
+          // Uses Home Assistant climate attribute: hvac_action (heating/cooling/idle)
+          const std::string action = id(hvac_action).state.c_str();
+          if (action == "heating") {
+            id(s3_box_lcd).print(40, 200, id(font_mdi), Color::WHITE, TextAlign::CENTER, "󰈸");  // fire
+          } else if (action == "cooling") {
+            id(s3_box_lcd).print(40, 200, id(font_mdi), Color::WHITE, TextAlign::CENTER, "󰜗");  // snowflake
+          }
+
   - id: draw_display
     then:
       - if:
@@ -831,8 +845,21 @@ font:
     glyphsets:
       - ${font_glyphsets}
 
+  - file: https://unpkg.com/@mdi/font@7.3.67/fonts/materialdesignicons-webfont.ttf
+    id: font_mdi
+    size: 26
+    glyphs:
+      - "󰈸"  # mdi:fire (F0238)
+      - "󰜗"  # mdi:snowflake (F0717)
+
 
 text_sensor:
+  - platform: homeassistant
+    id: hvac_action
+    entity_id: ${thermostat_entity}
+    attribute: hvac_action
+    internal: true
+
   - platform: version
     name: Firmware
     hide_timestamp: true
@@ -935,6 +962,8 @@ display:
 
           id(draw_timer_timeline).execute();
           id(draw_active_timer_widget).execute();
+          id(draw_hvac_icon).execute();
+
 
 
 
@@ -980,4 +1009,3 @@ display:
           it.fill(Color::BLACK);
           id(draw_timer_timeline).execute();
           id(draw_active_timer_widget).execute();
-
