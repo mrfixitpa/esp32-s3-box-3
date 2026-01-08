@@ -89,33 +89,6 @@ wifi:
 
 captive_portal:
 
-
-
-
-interval:
-  - interval: 1s
-    then:
-      - if:
-          condition:
-            lambda: |-
-              return
-                !id(init_in_progress) &&
-                wifi::global_wifi_component->is_connected() &&
-                api::global_api_server->is_connected() &&
-                (id(voice_assistant_phase) == ${voice_assist_idle_phase_id});
-          then:
-            - script.execute: draw_display
-
-sensor:
-  - platform: homeassistant
-    id: avg_indoor_temp
-    entity_id: sensor.average_indoor_temperature
-    internal: true
-
-time:
-  - platform: homeassistant
-    id: ha_time
-
 button:
   - platform: factory_reset
     id: factory_reset_btn
@@ -549,30 +522,6 @@ script:
             - lambda: id(voice_assistant_phase) = ${voice_assist_muted_phase_id};
 
 switch:
-  - platform: template
-    name: Clock AM/PM Indicator
-    id: ampm_toggle
-    restore_mode: RESTORE_DEFAULT_ON
-    optimistic: true
-    on_turn_on:
-      - lambda: id(show_ampm) = true;
-      - script.execute: draw_display
-    on_turn_off:
-      - lambda: id(show_ampm) = false;
-      - script.execute: draw_display
-
-  - platform: template
-    name: Clock 24 Hour Mode
-    id: clock_24h_mode
-    restore_mode: RESTORE_DEFAULT_OFF
-    optimistic: true
-    on_turn_on:
-      - lambda: id(use_24h) = true;
-      - script.execute: draw_display
-    on_turn_off:
-      - lambda: id(use_24h) = false;
-      - script.execute: draw_display
-
   - platform: gpio
     name: Speaker Enable
     pin: GPIO46
@@ -626,35 +575,6 @@ switch:
       - delay: 15min
       - switch.turn_off: timer_ringing
 
-number:
-  - platform: template
-    name: AM/PM Horizontal Offset
-    id: ampm_offset_x
-    entity_category: config
-    min_value: -80
-    max_value: 80
-    step: 1
-    restore_value: true
-    initial_value: 0
-    optimistic: true
-    on_value:
-      then:
-        - script.execute: draw_display
-
-  - platform: template
-    name: AM/PM Vertical Offset
-    id: ampm_offset_y
-    entity_category: config
-    min_value: -40
-    max_value: 40
-    step: 1
-    restore_value: true
-    initial_value: 0
-    optimistic: true
-    on_value:
-      then:
-        - script.execute: draw_display
-
 select:
   - platform: template
     entity_category: config
@@ -700,16 +620,6 @@ select:
                         - micro_wake_word.start
 
 globals:
-  - id: show_ampm
-    type: bool
-    restore_value: true
-    initial_value: "true"
-
-  - id: use_24h
-    type: bool
-    restore_value: true
-    initial_value: "false"
-
   - id: init_in_progress
     type: bool
     restore_value: false
@@ -805,53 +715,7 @@ font:
     glyphsets:
       - ${font_glyphsets}
 
-  - file:
-      type: gfonts
-      family: ${font_family}
-      weight: 600
-    id: font_clock
-    size: 86
-    glyphsets:
-      - ${font_glyphsets}
-
-  - file:
-      type: gfonts
-      family: ${font_family}
-      weight: 400
-    id: font_bottom
-    size: 24
-    glyphsets:
-      - ${font_glyphsets}
-  - file:
-      type: gfonts
-      family: ${font_family}
-      weight: 400
-    id: font_ampm
-    size: 20
-    glyphsets:
-      - ${font_glyphsets}
-
-  - file: https://unpkg.com/@mdi/font@7.3.67/fonts/materialdesignicons-webfont.ttf
-    id: font_mdi
-    size: 26
-    glyphs:
-      - "󰈸"  # mdi:fire (F0238)
-      - "󰜗"  # mdi:snowflake (F0717)
-      
 text_sensor:
-  - platform: version
-    name: Firmware
-    hide_timestamp: true
-
-  - platform: homeassistant
-    id: ecobee_hvac_action
-    entity_id: climate.ecobee_thermostat
-    attribute: hvac_action
-    internal: true
-    on_value:
-      then:
-        - script.execute: draw_display
-
   - id: text_request
     platform: template
     on_value:
@@ -911,84 +775,9 @@ display:
       - id: idle_page
         lambda: |-
           it.fill(id(idle_color));
-
-          auto t = id(ha_time).now();
-          if (t.is_valid()) {
-            bool colon_on = (t.second % 2) == 0;
-
-            int hour12 = t.hour % 12;
-            if (hour12 == 0) hour12 = 12;
-
-            if (id(use_24h)) {
-              // 24-hour mode (centered)
-              it.printf(150, 18, id(font_clock), Color::WHITE, TextAlign::TOP_RIGHT, "%02d", t.hour);
-              it.printf(160, 18, id(font_clock), (colon_on ? Color::WHITE : id(idle_color)), TextAlign::TOP_CENTER, ":");
-              it.printf(170, 18, id(font_clock), Color::WHITE, TextAlign::TOP_LEFT, "%02d", t.minute);
-            } else {
-              // 12-hour mode (NO leading zero; keep clock centered with temp)
-              it.printf(150, 18, id(font_clock), Color::WHITE, TextAlign::TOP_RIGHT, "%d", hour12);
-              it.printf(160, 18, id(font_clock), (colon_on ? Color::WHITE : id(idle_color)), TextAlign::TOP_CENTER, ":");
-              it.printf(170, 18, id(font_clock), Color::WHITE, TextAlign::TOP_LEFT, "%02d", t.minute);
-
-              // Optional AM/PM indicator (left of the colon, vertically centered in the clock)
-              if (id(show_ampm)) {
-                const char* ampm = (t.hour >= 12) ? "PM" : "AM";
-                int ampm_x = 70 + (int) id(ampm_offset_x).state;
-                int ampm_y = 53 + (int) id(ampm_offset_y).state;
-                it.printf(ampm_x, ampm_y, id(font_ampm), Color::WHITE, TextAlign::TOP_RIGHT, "%s", ampm);
-              }
-            }
-          } else {
-            it.printf(160, 40, id(font_bottom), Color::WHITE, TextAlign::CENTER, "--:--");
-          }
-
-          // HVAC status icon (Ecobee hvac_action)
-
-
-          // Shows a flame when heating, snowflake when cooling.
-
-
-          const std::string hvac = id(ecobee_hvac_action).has_state() ? id(ecobee_hvac_action).state.c_str() : "";
-
-
-          if (hvac == "heating") {
-
-
-            it.printf(40, 200, id(font_mdi), Color::WHITE, TextAlign::CENTER, u8"\U000F0238");
-
-
-          } else if (hvac == "cooling") {
-
-
-            it.printf(40, 200, id(font_mdi), Color::WHITE, TextAlign::CENTER, u8"\U000F0717");
-
-
-          }
-
-
-
-          if (!isnan(id(avg_indoor_temp).state)) {
-
-
-            it.printf(160, 200, id(font_bottom), Color::WHITE, TextAlign::CENTER, "Indoor Temp %.0f°", id(avg_indoor_temp).state);
-
-
-          } else {
-
-
-            it.printf(160, 200, id(font_bottom), Color::WHITE, TextAlign::CENTER, "Indoor Temp --°");
-
-
-          }
+          it.image((it.get_width() / 2), (it.get_height() / 2), id(casita_idle), ImageAlign::CENTER);
           id(draw_timer_timeline).execute();
           id(draw_active_timer_widget).execute();
-
-
-
-
-
-
-
       - id: listening_page
         lambda: |-
           it.fill(id(listening_color));
