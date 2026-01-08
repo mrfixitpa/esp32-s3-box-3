@@ -626,6 +626,35 @@ switch:
       - delay: 15min
       - switch.turn_off: timer_ringing
 
+number:
+  - platform: template
+    name: AM/PM Horizontal Offset
+    id: ampm_offset_x
+    entity_category: config
+    min_value: -80
+    max_value: 80
+    step: 1
+    restore_value: true
+    initial_value: 0
+    optimistic: true
+    on_value:
+      then:
+        - script.execute: draw_display
+
+  - platform: template
+    name: AM/PM Vertical Offset
+    id: ampm_offset_y
+    entity_category: config
+    min_value: -40
+    max_value: 40
+    step: 1
+    restore_value: true
+    initial_value: 0
+    optimistic: true
+    on_value:
+      then:
+        - script.execute: draw_display
+
 select:
   - platform: template
     entity_category: config
@@ -889,7 +918,9 @@ display:
               // Optional AM/PM indicator (left of the colon, vertically centered in the clock)
               if (id(show_ampm)) {
                 const char* ampm = (t.hour >= 12) ? "PM" : "AM";
-                it.printf(70, 53, id(font_ampm), Color::WHITE, TextAlign::TOP_RIGHT, "%s", ampm);
+                int ampm_x = 70 + (int) id(ampm_offset_x).state;
+                int ampm_y = 53 + (int) id(ampm_offset_y).state;
+                it.printf(ampm_x, ampm_y, id(font_ampm), Color::WHITE, TextAlign::TOP_RIGHT, "%s", ampm);
               }
             }
           } else {
