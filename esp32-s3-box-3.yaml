@@ -635,7 +635,7 @@ number:
     max_value: 80
     step: 1
     restore_value: true
-    initial_value: -20
+    initial_value: 0
     optimistic: true
     on_value:
       then:
@@ -649,7 +649,7 @@ number:
     max_value: 40
     step: 1
     restore_value: true
-    initial_value: 15
+    initial_value: 0
     optimistic: true
     on_value:
       then:
@@ -831,11 +831,27 @@ font:
     glyphsets:
       - ${font_glyphsets}
 
+  - file: https://unpkg.com/@mdi/font@7.3.67/fonts/materialdesignicons-webfont.ttf
+    id: font_mdi
+    size: 26
+    glyphs:
+      - "\\U000F0238"  # mdi:fire
+      - "\\U000F0717"  # mdi:snowflake
+
 
 text_sensor:
   - platform: version
     name: Firmware
     hide_timestamp: true
+
+  - platform: homeassistant
+    id: ecobee_hvac_action
+    entity_id: climate.ecobee_thermostat
+    attribute: hvac_action
+    internal: true
+    on_value:
+      then:
+        - script.execute: draw_display
 
   - id: text_request
     platform: template
@@ -927,12 +943,44 @@ display:
             it.printf(160, 40, id(font_bottom), Color::WHITE, TextAlign::CENTER, "--:--");
           }
 
-          if (!isnan(id(avg_indoor_temp).state)) {
-            it.printf(160, 200, id(font_bottom), Color::WHITE, TextAlign::CENTER, "Indoor Temp %.0f°", id(avg_indoor_temp).state);
-          } else {
-            it.printf(160, 200, id(font_bottom), Color::WHITE, TextAlign::CENTER, "Indoor Temp --°");
+          // HVAC status icon (Ecobee hvac_action)
+
+
+          // Shows a flame when heating, snowflake when cooling.
+
+
+          const std::string hvac = id(ecobee_hvac_action).has_state() ? id(ecobee_hvac_action).state.c_str() : "";
+
+
+          if (hvac == "heating") {
+
+
+            it.printf(40, 200, id(font_mdi), Color::WHITE, TextAlign::CENTER, u8"\U000F0238");
+
+
+          } else if (hvac == "cooling") {
+
+
+            it.printf(40, 200, id(font_mdi), Color::WHITE, TextAlign::CENTER, u8"\U000F0717");
+
+
           }
 
+
+
+          if (!isnan(id(avg_indoor_temp).state)) {
+
+
+            it.printf(160, 200, id(font_bottom), Color::WHITE, TextAlign::CENTER, "Indoor Temp %.0f°", id(avg_indoor_temp).state);
+
+
+          } else {
+
+
+            it.printf(160, 200, id(font_bottom), Color::WHITE, TextAlign::CENTER, "Indoor Temp --°");
+
+
+          }
           id(draw_timer_timeline).execute();
           id(draw_active_timer_widget).execute();
 
