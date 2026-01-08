@@ -837,8 +837,7 @@ font:
     glyphs:
       - "\\U000F0238"  # mdi:fire
       - "\\U000F0717"  # mdi:snowflake
-
-
+      
 text_sensor:
   - platform: version
     name: Firmware
