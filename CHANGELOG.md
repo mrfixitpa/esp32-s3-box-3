@@ -8,6 +8,31 @@ This project follows a simple semantic versioning approach:
 - **Patch / Pre-release** versions fix bugs or regressions during testing
 
 ---
+## [v1.3.0] – 2026-01-09
+
+### Added
+- UI Theme Color Picker exposed as an ESPHome-only RGB light.
+- Full Home Assistant color wheel support without HA helpers or templates.
+- Theme color applied consistently to:
+  - Idle clock
+  - AM / PM indicator
+  - Indoor temperature text
+
+### Fixed
+- Restored idle screen clock rendering regression.
+- Corrected ESPHome light implementation to ensure successful compilation and installation.
+
+### Behavior Notes
+- HVAC status icons are intentionally excluded from theming:
+  - 🔥 Heating icon is always red
+  - ❄️ Cooling icon is always blue
+- Screen backlight remains brightness-only (hardware limitation).
+
+### Validation
+- Tested and verified through multiple pre-release iterations.
+- Package YAML fully validated with no duplicate keys or invalid platforms.
+
+---
 
 ## [v1.3.0-pre.2] – 2026-01-09
 
