@@ -106,7 +106,16 @@ Includes:
 
 ## 🖼️ Screen Illustrations (Images)
 
-This project uses **custom full-screen illustrations** to represent the different voice assistant states (idle, listening, thinking, speaking, error, etc.).
+This project uses **custom full-screen illustrations**
+
+
+### Included Free Illustration Sets
+This repository includes **two free, ready-to-use illustration sets** you can try immediately:
+
+- https://github.com/mrfixitpa/esp32-s3-box-3/tree/main/illustrations
+
+Each set contains full-screen images sized correctly for the ESP32-S3-Box-3 display and can be swapped in by updating the image substitutions in your ESPHome config.
+ to represent the different voice assistant states (idle, listening, thinking, speaking, error, etc.).
 
 ### Image Requirements
 - Resolution: **320 × 240**
@@ -206,7 +215,11 @@ text_sensor:
 ---
 
 ## 🛠 Notes & Tips
-- Screen dimming is best handled using Home Assistant automations
+
+- Screen dimming is best handled using Home Assistant automations  
+  - Example automation: **ESP32-S3-Box-3 Screen Brightness Automation**  
+  - https://github.com/mrfixitpa/HA-Code-and-Templates/blob/main/ESP32-S3-Box3-Screen-Brightness-Automation
+
 - Layout prevents jitter when the colon blinks
 - Designed for readability from across a room
 
@@ -214,6 +227,3 @@ text_sensor:
 
 ## 📄 License
 Provided as-is for personal and educational use.
-
-
-
