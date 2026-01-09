@@ -156,6 +156,28 @@ light:
     restore_mode: RESTORE_DEFAULT_ON
     default_transition_length: 250ms
 
+
+  - platform: template
+    name: "Box3 UI Theme"
+    id: ui_theme_light
+    icon: "mdi:palette"
+    restore_mode: RESTORE_DEFAULT_ON
+    optimistic: true
+    on_turn_on:
+      - lambda: |-
+          id(ui_theme_on) = true;
+      - script.execute: draw_display
+    on_turn_off:
+      - lambda: |-
+          id(ui_theme_on) = false;
+      - script.execute: draw_display
+    set_rgb:
+      - lambda: |-
+          id(ui_theme_r) = (uint8_t) roundf(red * 255.0f);
+          id(ui_theme_g) = (uint8_t) roundf(green * 255.0f);
+          id(ui_theme_b) = (uint8_t) roundf(blue * 255.0f);
+      - script.execute: draw_display
+
 i2c:
   scl: GPIO18
   sda: GPIO8
@@ -364,9 +386,9 @@ script:
           // Uses Home Assistant climate attribute: hvac_action (heating/cooling/idle)
           const std::string action = id(hvac_action).state.c_str();
           if (action == "heating") {
-            id(s3_box_lcd).print(40, 200, id(font_mdi), Color::WHITE, TextAlign::CENTER, "󰈸");  // fire
+            id(s3_box_lcd).print(40, 200, id(font_mdi), Color(255, 0, 0), TextAlign::CENTER, "󰈸");  // fire
           } else if (action == "cooling") {
-            id(s3_box_lcd).print(40, 200, id(font_mdi), Color::WHITE, TextAlign::CENTER, "󰜗");  // snowflake
+            id(s3_box_lcd).print(40, 200, id(font_mdi), Color(0, 140, 255), TextAlign::CENTER, "󰜗");  // snowflake
           }
 
   - id: draw_display
@@ -724,6 +746,27 @@ globals:
     restore_value: true
     initial_value: "false"
 
+
+  - id: ui_theme_on
+    type: bool
+    restore_value: true
+    initial_value: "true"
+
+  - id: ui_theme_r
+    type: uint8_t
+    restore_value: true
+    initial_value: "255"
+
+  - id: ui_theme_g
+    type: uint8_t
+    restore_value: true
+    initial_value: "255"
+
+  - id: ui_theme_b
+    type: uint8_t
+    restore_value: true
+    initial_value: "255"
+
   - id: init_in_progress
     type: bool
     restore_value: false
@@ -924,6 +967,8 @@ display:
         lambda: |-
           it.fill(id(idle_color));
 
+          Color accent = id(ui_theme_on) ? Color(id(ui_theme_r), id(ui_theme_g), id(ui_theme_b)) : accent;
+
           auto t = id(ha_time).now();
           if (t.is_valid()) {
             bool colon_on = (t.second % 2) == 0;
@@ -933,31 +978,31 @@ display:
 
             if (id(use_24h)) {
               // 24-hour mode (centered)
-              it.printf(150, 18, id(font_clock), Color::WHITE, TextAlign::TOP_RIGHT, "%02d", t.hour);
-              it.printf(160, 18, id(font_clock), (colon_on ? Color::WHITE : id(idle_color)), TextAlign::TOP_CENTER, ":");
-              it.printf(170, 18, id(font_clock), Color::WHITE, TextAlign::TOP_LEFT, "%02d", t.minute);
+              it.printf(150, 18, id(font_clock), accent, TextAlign::TOP_RIGHT, "%02d", t.hour);
+              it.printf(160, 18, id(font_clock), (colon_on ? accent : id(idle_color)), TextAlign::TOP_CENTER, ":");
+              it.printf(170, 18, id(font_clock), accent, TextAlign::TOP_LEFT, "%02d", t.minute);
             } else {
               // 12-hour mode (NO leading zero; keep clock centered with temp)
-              it.printf(150, 18, id(font_clock), Color::WHITE, TextAlign::TOP_RIGHT, "%d", hour12);
-              it.printf(160, 18, id(font_clock), (colon_on ? Color::WHITE : id(idle_color)), TextAlign::TOP_CENTER, ":");
-              it.printf(170, 18, id(font_clock), Color::WHITE, TextAlign::TOP_LEFT, "%02d", t.minute);
+              it.printf(150, 18, id(font_clock), accent, TextAlign::TOP_RIGHT, "%d", hour12);
+              it.printf(160, 18, id(font_clock), (colon_on ? accent : id(idle_color)), TextAlign::TOP_CENTER, ":");
+              it.printf(170, 18, id(font_clock), accent, TextAlign::TOP_LEFT, "%02d", t.minute);
 
               // Optional AM/PM indicator (left of the colon, vertically centered in the clock)
               if (id(show_ampm)) {
                 const char* ampm = (t.hour >= 12) ? "PM" : "AM";
                 int ampm_x = 70 + (int) id(ampm_offset_x).state;
                 int ampm_y = 53 + (int) id(ampm_offset_y).state;
-                it.printf(ampm_x, ampm_y, id(font_ampm), Color::WHITE, TextAlign::TOP_RIGHT, "%s", ampm);
+                it.printf(ampm_x, ampm_y, id(font_ampm), accent, TextAlign::TOP_RIGHT, "%s", ampm);
               }
             }
           } else {
-            it.printf(160, 40, id(font_bottom), Color::WHITE, TextAlign::CENTER, "--:--");
+            it.printf(160, 40, id(font_bottom), accent, TextAlign::CENTER, "--:--");
           }
 
           if (!isnan(id(avg_indoor_temp).state)) {
-            it.printf(160, 200, id(font_bottom), Color::WHITE, TextAlign::CENTER, "Indoor Temp %.0f°", id(avg_indoor_temp).state);
+            it.printf(160, 200, id(font_bottom), accent, TextAlign::CENTER, "Indoor Temp %.0f°", id(avg_indoor_temp).state);
           } else {
-            it.printf(160, 200, id(font_bottom), Color::WHITE, TextAlign::CENTER, "Indoor Temp --°");
+            it.printf(160, 200, id(font_bottom), accent, TextAlign::CENTER, "Indoor Temp --°");
           }
 
           id(draw_timer_timeline).execute();
@@ -1009,3 +1054,4 @@ display:
           it.fill(Color::BLACK);
           id(draw_timer_timeline).execute();
           id(draw_active_timer_widget).execute();
+
