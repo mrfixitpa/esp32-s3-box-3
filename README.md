@@ -4,7 +4,8 @@ This repository contains a **custom ESPHome package** for the **ESP32-S3-Box-3**
 
 The goal of this project is to provide a **clean, minimal, and informative display** by removing unnecessary UI elements and adding useful, always-visible information when the device is idle.
 
-> ⚠️ **Note:** Some features described below were introduced in **v1.3.0** and are currently available as a **pre-release** (`v1.3.0-pre.1`).
+> ⚠️ **Pre-release notice:**  
+> Features introduced in **v1.3.0** are currently available as a **pre-release** (`v1.3.0-pre.2`) while they undergo final validation.
 
 ---
 
@@ -147,7 +148,7 @@ In your **main ESPHome device YAML**, add:
 ```yaml
 packages:
   s3_box:
-    url: github://YOUR_USERNAME/YOUR_REPO/esp32-s3-box-3.yaml@v1.3.0-pre.1
+    url: github://mrfixitpa/esp32-s3-box-3/esp32-s3-box-3.yaml@v1.3.0-pre.2
 ```
 
 ---
@@ -186,3 +187,4 @@ Once online, the idle screen will show the clock, temperature, HVAC status, and 
 
 ## 📄 License
 Provided as-is for personal and educational use.
+
