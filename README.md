@@ -4,8 +4,8 @@ This repository contains a **custom ESPHome package** for the **ESP32-S3-Box-3**
 
 The goal of this project is to provide a **clean, minimal, and informative display** by removing unnecessary UI elements and adding useful, always-visible information when the device is idle.
 
-> ⚠️ **Pre-release notice:**  
-> Features introduced in **v1.3.0** are currently available as a **pre-release** (`v1.3.0-pre.2`) while they undergo final validation.
+> ✅ **Stable Release:**  
+> The features described below are part of the **v1.3.0 stable release**.
 
 ---
 
@@ -33,7 +33,7 @@ The display automatically returns to this screen after voice interactions comple
 
 ---
 
-### 🎨 UI Theme Color Picker (New in v1.3.0)
+### 🎨 UI Theme Color Picker (Introduced in v1.3.0)
 The ESP32-S3-Box-3 exposes a **virtual RGB light** in Home Assistant that provides a **full color wheel UI**.
 
 - The selected color is applied to:
@@ -82,7 +82,7 @@ Includes:
 - Bubble-free display layout
 - Idle clock with temperature
 - HVAC heating/cooling indicator (thermostat-agnostic)
-- UI theme color picker (v1.3.0+)
+- UI theme color picker
 - Full voice assistant state illustrations
 - User-adjustable clock and AM/PM settings
 
@@ -106,8 +106,7 @@ Includes:
 
 ## 🖼️ Screen Illustrations (Images)
 
-This project uses **custom full-screen illustrations**
-
+This project uses **custom full-screen illustrations** to represent the different voice assistant states (idle, listening, thinking, speaking, error, etc.).
 
 ### Included Free Illustration Sets
 This repository includes **two free, ready-to-use illustration sets** you can try immediately:
@@ -115,7 +114,6 @@ This repository includes **two free, ready-to-use illustration sets** you can tr
 - https://github.com/mrfixitpa/esp32-s3-box-3/tree/main/illustrations
 
 Each set contains full-screen images sized correctly for the ESP32-S3-Box-3 display and can be swapped in by updating the image substitutions in your ESPHome config.
- to represent the different voice assistant states (idle, listening, thinking, speaking, error, etc.).
 
 ### Image Requirements
 - Resolution: **320 × 240**
@@ -172,7 +170,7 @@ In your **main ESPHome device YAML**, add:
 ```yaml
 packages:
   s3_box:
-    url: github://mrfixitpa/esp32-s3-box-3/esp32-s3-box-3.yaml@v1.3.0-pre.2
+    url: github://mrfixitpa/esp32-s3-box-3/esp32-s3-box-3.yaml@v1.3.0
 ```
 
 ---
@@ -219,7 +217,6 @@ text_sensor:
 - Screen dimming is best handled using Home Assistant automations  
   - Example automation: **ESP32-S3-Box-3 Screen Brightness Automation**  
   - https://github.com/mrfixitpa/HA-Code-and-Templates/blob/main/ESP32-S3-Box3-Screen-Brightness-Automation
-
 - Layout prevents jitter when the colon blinks
 - Designed for readability from across a room
 
