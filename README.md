@@ -4,6 +4,8 @@ This repository contains a **custom ESPHome package** for the **ESP32-S3-Box-3**
 
 The goal of this project is to provide a **clean, minimal, and informative display** by removing unnecessary UI elements and adding useful, always-visible information when the device is idle.
 
+> ⚠️ **Note:** Some features described below were introduced in **v1.3.0** and are currently available as a **pre-release** (`v1.3.0-pre.1`).
+
 ---
 
 ## ✨ Features
@@ -20,13 +22,27 @@ When the voice assistant is idle, the display shows:
 - A **large, centered digital clock**
 - **Indoor temperature** pulled directly from Home Assistant
 - **HVAC system status icon**
-  - 🔥 Heating
-  - ❄️ Cooling
+  - 🔥 Heating (red, fixed)
+  - ❄️ Cooling (blue, fixed)
   - Hidden when idle
 - Optional **blinking colon**
 - Optional **AM/PM indicator** (12-hour mode only)
 
 The display automatically returns to this screen after voice interactions complete.
+
+---
+
+### 🎨 UI Theme Color Picker (New in v1.3.0)
+The ESP32-S3-Box-3 exposes a **virtual RGB light** in Home Assistant that provides a **full color wheel UI**.
+
+- The selected color is applied to:
+  - Clock text
+  - AM / PM indicator
+  - Indoor temperature text
+- Color selection is **stored on the device** and restored after reboot
+- HVAC icons are **not affected** by the theme color
+
+> This feature is implemented **entirely in ESPHome** — no Home Assistant helpers or templates are required.
 
 ---
 
@@ -65,6 +81,7 @@ Includes:
 - Bubble-free display layout
 - Idle clock with temperature
 - HVAC heating/cooling indicator (Ecobee compatible)
+- UI theme color picker (v1.3.0+)
 - Full voice assistant state illustrations
 - User-adjustable clock and AM/PM settings
 
@@ -112,22 +129,6 @@ substitutions:
 
 ---
 
-## 📸 Screenshots
-
-<p align="center">
-  <img src="images/idle.jpg" width="45%">
-  <img src="images/listening.jpg" width="45%">
-</p>
-<p align="center"><em>Idle Screen (Clock, Temperature & HVAC Status) • Listening</em></p>
-
-<p align="center">
-  <img src="images/thinking.jpg" width="45%">
-  <img src="images/speaking.jpg" width="45%">
-</p>
-<p align="center"><em>Thinking • Speaking / Replying</em></p>
-
----
-
 ## 🚀 Quick Start Guide
 
 ### Requirements
@@ -146,7 +147,7 @@ In your **main ESPHome device YAML**, add:
 ```yaml
 packages:
   s3_box:
-    url: github://YOUR_USERNAME/YOUR_REPO/esp32-s3-box-3.yaml@v1.2.0
+    url: github://YOUR_USERNAME/YOUR_REPO/esp32-s3-box-3.yaml@v1.3.0-pre.1
 ```
 
 ---
@@ -171,7 +172,7 @@ Replace the entity ID with your own sensor if needed.
 - Upload firmware to the ESP32-S3-Box-3
 - Wait for the device to reboot
 
-Once online, the idle screen will show the clock, temperature, and HVAC status.
+Once online, the idle screen will show the clock, temperature, HVAC status, and theme color.
 
 ---
 
@@ -185,4 +186,3 @@ Once online, the idle screen will show the clock, temperature, and HVAC status.
 
 ## 📄 License
 Provided as-is for personal and educational use.
-
