@@ -5,7 +5,26 @@ All notable changes to this project will be documented in this file.
 This project follows a simple semantic versioning approach:
 - **Major** versions introduce new user-facing features or behavior changes
 - **Minor** versions add functionality or improvements
-- **Patch** versions fix bugs or regressions
+- **Patch / Pre-release** versions fix bugs or regressions during testing
+
+---
+
+## [v1.3.0-pre.2] – 2026-01-09
+
+⚠️ **Pre-release** — fixes issues found in `v1.3.0-pre.1`.
+
+### Fixed
+- ESPHome compilation failure caused by use of an invalid `light.template` platform.
+- Replaced the invalid template light with a **valid virtual RGB light** backed by template outputs.
+
+### Changed
+- UI Theme Color Picker implementation corrected while preserving the same Home Assistant color wheel UI.
+
+### Validation
+- Package YAML fully validated:
+  - No duplicate top-level keys
+  - All referenced IDs verified
+  - Successful ESPHome install confirmed
 
 ---
 
@@ -23,7 +42,6 @@ This project follows a simple semantic versioning approach:
 
 ### Fixed
 - Restored idle screen clock regression introduced in earlier releases.
-- Ensured continuous clock updates while idle.
 
 ### Behavior Notes
 - HVAC status icons are intentionally excluded from theming:
@@ -39,7 +57,7 @@ This project follows a simple semantic versioning approach:
 - Attempted fix for idle clock rendering issue.
 
 ### Notes
-- This release is superseded by v1.3.0-pre.1 due to package validation issues.
+- This release is superseded by v1.3.0 pre-releases due to package validation issues.
 
 ---
 
