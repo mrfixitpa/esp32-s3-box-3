@@ -146,6 +146,31 @@ output:
     pin: GPIO47
     id: backlight_output
 
+  - platform: template
+    id: ui_r_out
+    type: float
+    write_action:
+      - lambda: |-
+          id(ui_theme_r) = (uint8_t) roundf(state * 255.0f);
+          id(draw_display).execute();
+
+  - platform: template
+    id: ui_g_out
+    type: float
+    write_action:
+      - lambda: |-
+          id(ui_theme_g) = (uint8_t) roundf(state * 255.0f);
+          id(draw_display).execute();
+
+  - platform: template
+    id: ui_b_out
+    type: float
+    write_action:
+      - lambda: |-
+          id(ui_theme_b) = (uint8_t) roundf(state * 255.0f);
+          id(draw_display).execute();
+
+
 light:
   - platform: monochromatic
     id: led
@@ -157,12 +182,14 @@ light:
     default_transition_length: 250ms
 
 
-  - platform: template
+  - platform: rgb
     name: "Box3 UI Theme"
     id: ui_theme_light
     icon: "mdi:palette"
+    red: ui_r_out
+    green: ui_g_out
+    blue: ui_b_out
     restore_mode: RESTORE_DEFAULT_ON
-    optimistic: true
     on_turn_on:
       - lambda: |-
           id(ui_theme_on) = true;
@@ -170,12 +197,6 @@ light:
     on_turn_off:
       - lambda: |-
           id(ui_theme_on) = false;
-      - script.execute: draw_display
-    set_rgb:
-      - lambda: |-
-          id(ui_theme_r) = (uint8_t) roundf(red * 255.0f);
-          id(ui_theme_g) = (uint8_t) roundf(green * 255.0f);
-          id(ui_theme_b) = (uint8_t) roundf(blue * 255.0f);
       - script.execute: draw_display
 
 i2c:
@@ -1054,4 +1075,3 @@ display:
           it.fill(Color::BLACK);
           id(draw_timer_timeline).execute();
           id(draw_active_timer_widget).execute();
-
