@@ -81,52 +81,10 @@ Once the response is complete, the display returns to the idle clock screen.
 Includes:
 - Bubble-free display layout
 - Idle clock with temperature
-- HVAC heating/cooling indicator (Ecobee compatible)
+- HVAC heating/cooling indicator (thermostat-agnostic)
 - UI theme color picker (v1.3.0+)
 - Full voice assistant state illustrations
 - User-adjustable clock and AM/PM settings
-
----
-
-## 🖼️ Screen Illustrations (Images)
-
-This project uses **custom full-screen illustrations** to represent the different voice assistant states (idle, listening, thinking, speaking, error, etc.).
-
-### Image Requirements
-- Resolution: **320 × 240**
-- Orientation: Landscape
-- Formats: `.png` or `.jpg`
-- Simple, high-contrast designs recommended
-
----
-
-### Where to Store Images (Home Assistant)
-
-Upload images to:
-```
-/config/www/voice_assistant_images/
-```
-
-Example filenames:
-```
-idle.jpg
-listening.jpg
-thinking.jpg
-speaking.jpg
-error.jpg
-```
-
-Reference them in ESPHome like this:
-
-```yaml
-substitutions:
-  idle_illustration_file: /local/voice_assistant_images/idle.jpg
-  listening_illustration_file: /local/voice_assistant_images/listening.jpg
-  thinking_illustration_file: /local/voice_assistant_images/thinking.jpg
-  replying_illustration_file: /local/voice_assistant_images/speaking.jpg
-```
-
-> `/local/` maps to `/config/www/` in Home Assistant.
 
 ---
 
@@ -136,9 +94,11 @@ substitutions:
 - ESP32-S3-Box-3
 - Home Assistant
 - ESPHome installed in Home Assistant
-- Existing Home Assistant temperature sensor  
-  *(example: `sensor.average_indoor_temperature`)*
-- Ecobee thermostat (for HVAC status icon)
+- **Any Home Assistant temperature sensor**
+- **Any Home Assistant climate (thermostat) entity** that exposes `hvac_action`
+
+> This package is **not limited to Ecobee**.  
+> Any thermostat integration that provides the `hvac_action` attribute can be used.
 
 ---
 
@@ -154,7 +114,9 @@ packages:
 ---
 
 ### Step 2: Edit Before Compiling
-You **must** define your indoor temperature sensor:
+
+#### 1️⃣ Define your indoor temperature sensor
+You **must** define an indoor temperature sensor from Home Assistant:
 
 ```yaml
 sensor:
@@ -164,7 +126,29 @@ sensor:
     internal: true
 ```
 
-Replace the entity ID with your own sensor if needed.
+Replace `sensor.average_indoor_temperature` with **any** valid Home Assistant temperature sensor.
+
+---
+
+#### 2️⃣ Define your thermostat (HVAC status)
+You must also define a thermostat entity so the display can determine **heating vs cooling**.
+
+```yaml
+text_sensor:
+  - platform: homeassistant
+    id: hvac_action
+    entity_id: climate.your_thermostat
+    attribute: hvac_action
+    internal: true
+```
+
+- Replace `climate.your_thermostat` with your thermostat entity ID
+- The `hvac_action` attribute is used to determine:
+  - 🔥 Heating → flame icon
+  - ❄️ Cooling → snowflake icon
+- If `hvac_action` is `idle` or unavailable, the icon is hidden
+
+Most modern thermostat integrations (Ecobee, Honeywell, Nest, etc.) expose this attribute.
 
 ---
 
@@ -187,4 +171,5 @@ Once online, the idle screen will show the clock, temperature, HVAC status, and 
 
 ## 📄 License
 Provided as-is for personal and educational use.
+
 
